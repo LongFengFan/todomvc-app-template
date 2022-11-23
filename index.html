@@ -18,17 +18,19 @@
 			</header>
 			<!-- This section should be hidden by default and shown when there are todos -->
 			<section class="main" v-show="todos.length">
-				<input id="toggle-all" class="toggle-all" type="checkbox" v-on:click="toggleAll">
+				<input id="toggle-all" class="toggle-all" type="checkbox" v-model="remainting" v-on:click="toggleAll">
 				<label for="toggle-all">Mark all as complete</label>
 
 				<ul class="todo-list">
-					<li v-for = "item in todos" :key ="item.id" :class = "{completed: item.completed}">
+					<li v-for = "item in toDoBySelectType" :key ="item.id" :class = "{completed: item.completed, todo:true, editing : item === editingTodo}">
 						<div class="view">
 							<input class="toggle" type="checkbox" v-model = "item.completed">
-							<label>{{item.title}}</label>
-							<button class="destroy"></button>
+							<label @dblclick="editTodo(item)">{{item.title}}</label>
+							<button class="destroy" @click="delteTodo(item)"></button>
 						</div>
-						<input class="edit" value="Create a TodoMVC template">
+						<input class="edit" v-model="item.title"
+						 v-edit-focus="item === editingTodo"
+						  @keyup.esc="cancelEdit(item)" @keyup.enter="saveEdit()" @blur="saveEdit(item)">
 					</li>
 				</ul>
 			</section>
@@ -39,13 +41,13 @@
 				<!-- Remove this if you don't implement routing -->
 				<ul class="filters">
 					<li>
-						<a class="selected" href="#/">All</a>
+						<a @click="selectType='all'" :class="{selected : selectType==='all'}" href="javascript:;">All</a>
 					</li>
 					<li>
-						<a href="#/active">Active</a>
+						<a @click="selectType='active'" :class="{selected : selectType==='active'}" href="javascript:;">Active</a>
 					</li>
 					<li>
-						<a href="#/completed">Completed</a>
+						<a @click="selectType='completed'" :class="{selected : selectType==='completed'}" href="javascript:;">Completed</a>
 					</li>
 				</ul>
 				<!-- Hidden if no completed items are left ↓ -->
